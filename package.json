@@ -1,0 +1,14 @@
+{
+  "name": "chesslens",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "demo:notation": "node scripts/notation-demo.mjs",
+    "demo:stockfish": "node scripts/stockfish-analyze.mjs"
+  },
+  "dependencies": {
+    "chess.js": "^1.4.0",
+    "stockfish": "^19.0.0"
+  }
+}

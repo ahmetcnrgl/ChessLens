@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="tr">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ChessLens — Bir el satranç</title><link rel="stylesheet" href="styles.css"/></head>
+<body><div class="app-shell">
+<header class="topbar"><a class="brand" href="#" id="homeButton" aria-label="ChessLens ana sayfa"><span class="brand-mark">♞</span>ChessLens</a><div class="profile-chip"><span class="header-avatar avatar-ahmet" id="headerAvatar" aria-hidden="true"></span><b>Ahmet</b></div></header>
+<main class="screen select-screen active" id="selectScreen">
+<section class="selection-intro"><h1>Bir el oynayalım mı?</h1><p>Rakibini seç. Acele yok, hamlelerini birlikte düşünürüz.</p></section>
+<section class="master-grid" aria-label="Rakip seçimi">
+<button class="master-card" type="button" data-master="capablanca" aria-pressed="false"><span class="portrait avatar-capablanca" aria-hidden="true"></span><span class="master-copy"><b>Kolay bot</b><small>José</small></span><span class="bot-description">Isınmak ve yeni fikirler denemek için.</span><span class="selection-indicator" aria-hidden="true"></span></button>
+<button class="master-card" type="button" data-master="judit" aria-pressed="false"><span class="portrait avatar-judit" aria-hidden="true"></span><span class="master-copy"><b>Orta bot</b><small>Judit</small></span><span class="bot-description">Biraz düşün, güzel bir hamle bul.</span><span class="selection-indicator" aria-hidden="true"></span></button>
+<button class="master-card" type="button" data-master="magnus" aria-pressed="false"><span class="portrait avatar-magnus" aria-hidden="true"></span><span class="master-copy"><b>Zor bot</b><small>Magnus</small></span><span class="bot-description">Her hamlenin hesabını yapmayı sevenlere.</span><span class="selection-indicator" aria-hidden="true"></span></button>
+</section>
+<section class="selection-actions"><div class="start-group"><button class="start-button" id="startGameButton" type="button">Oyuna başla <span>→</span></button></div></section>
+</main>
+<main class="screen game-screen" id="gameScreen">
+<section class="game-main"><div class="opponent-bar"><button class="back-button" id="changeOpponentButton" type="button">← Rakibi değiştir</button></div>
+<div class="board-scene" id="boardScene"><div class="board-stage">
+<div class="board-heading"><div class="opponent-identity"><span class="opponent-avatar avatar-judit" id="gameOpponentFace" aria-hidden="true"></span><b id="gameOpponentName">Judit</b></div><div class="clock">09:42</div></div>
+<div class="board-frame"><div class="board" id="board" role="grid" aria-label="Satranç tahtası"></div></div>
+<div class="board-footer"><div class="board-actions"><button id="undoButton" type="button" aria-label="Hamle fikrini yeniden incele">↶</button><button id="flipButton" type="button" aria-label="Tahtayı çevir">⇅</button><div class="clock">10:00</div></div></div>
+</div></div></section>
+<aside class="game-sidebar"><section class="coach-panel" id="coachPopover" aria-label="Lens ile sohbet">
+<header><div class="coach-title"><span class="coach-avatar avatar-coach" aria-hidden="true"></span><div><b>Lens</b></div></div></header>
+<section class="coach-status"><div><span>Tahtada durum</span><b id="advantageScore">+0.4</b></div><p id="positionSummary">Beyaz biraz daha rahat.</p><div class="advantage-track"><i id="advantageFill"></i></div><div class="advantage-labels"><span>Beyaz <b id="advantageText">%57</b></span><span id="sidebarOpponentName">Judit</span></div></section>
+<div class="chat-thread" id="chatThread" role="log" aria-live="polite"></div>
+<div class="quick-prompts"><button type="button" data-question="Bu hamle neden iyi?">Neden iyi?</button><button type="button" data-question="Daha iyi hamle neydi?">Başka bir fikir</button><button type="button" data-question="Şu an kim üstün?">Kim önde?</button></div>
+<form class="chat-input" id="coachForm"><input id="coachInput" aria-label="Lens'e mesajın" placeholder="Bu hamle hakkında sor…" autocomplete="off" maxlength="400"/><button id="sendCoachPrompt" type="submit" aria-label="Mesajı gönder">↑</button></form>
+</section></aside></main></div><script src="api.js"></script><script src="app.js"></script></body></html>
