@@ -1,0 +1,1 @@
+"""ChessLens Python backend package."""

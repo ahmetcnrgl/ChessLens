@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "demo:notation": "node scripts/notation-demo.mjs",
-    "demo:stockfish": "node scripts/stockfish-analyze.mjs"
+    "demo:stockfish": "node scripts/stockfish-analyze.mjs",
+    "demo:game": "node scripts/stockfish-game-demo.mjs",
+    "start": "node server.mjs",
+    "test": "node --test"
   },
   "dependencies": {
     "chess.js": "^1.4.0",

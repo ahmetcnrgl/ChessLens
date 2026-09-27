@@ -1,28 +1,34 @@
 <!doctype html>
-<html lang="tr">
-<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ChessLens — Bir el satranç</title><link rel="stylesheet" href="styles.css"/></head>
+<html lang="tr"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>ChessLens — Bir el satranç</title><link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="welcome.css"/></head>
 <body><div class="app-shell">
-<header class="topbar"><a class="brand" href="#" id="homeButton" aria-label="ChessLens ana sayfa"><span class="brand-mark">♞</span>ChessLens</a><div class="profile-chip"><span class="header-avatar avatar-ahmet" id="headerAvatar" aria-hidden="true"></span><b>Ahmet</b></div></header>
+<header class="topbar"><a class="brand" href="#" id="homeButton" aria-label="ChessLens ana sayfa"><span class="brand-mark" aria-hidden="true">♞</span>ChessLens</a><span class="header-avatar avatar-ahmet" aria-label="Profilin"></span></header>
 <main class="screen select-screen active" id="selectScreen">
-<section class="selection-intro"><h1>Bir el oynayalım mı?</h1><p>Rakibini seç. Acele yok, hamlelerini birlikte düşünürüz.</p></section>
+<section class="selection-intro"><h1>Bir el oynayalım mı?</h1><p>Rakibini seç.</p></section>
 <section class="master-grid" aria-label="Rakip seçimi">
-<button class="master-card" type="button" data-master="capablanca" aria-pressed="false"><span class="portrait avatar-capablanca" aria-hidden="true"></span><span class="master-copy"><b>Kolay bot</b><small>José</small></span><span class="bot-description">Isınmak ve yeni fikirler denemek için.</span><span class="selection-indicator" aria-hidden="true"></span></button>
-<button class="master-card" type="button" data-master="judit" aria-pressed="false"><span class="portrait avatar-judit" aria-hidden="true"></span><span class="master-copy"><b>Orta bot</b><small>Judit</small></span><span class="bot-description">Biraz düşün, güzel bir hamle bul.</span><span class="selection-indicator" aria-hidden="true"></span></button>
-<button class="master-card" type="button" data-master="magnus" aria-pressed="false"><span class="portrait avatar-magnus" aria-hidden="true"></span><span class="master-copy"><b>Zor bot</b><small>Magnus</small></span><span class="bot-description">Her hamlenin hesabını yapmayı sevenlere.</span><span class="selection-indicator" aria-hidden="true"></span></button>
+<button class="master-card" type="button" data-master="capablanca" aria-pressed="false"><span class="portrait avatar-capablanca" aria-hidden="true"></span><span class="master-copy"><b>José</b><small>Kolay</small></span><span class="bot-description">Satrançla yeni tanışanlar için.</span><span class="selection-indicator" aria-hidden="true"></span></button>
+<button class="master-card" type="button" data-master="judit" aria-pressed="false"><span class="portrait avatar-judit" aria-hidden="true"></span><span class="master-copy"><b>Judit</b><small>Orta</small></span><span class="bot-description">Temelleri biliyorsan, bir adım ileri.</span><span class="selection-indicator" aria-hidden="true"></span></button>
+<button class="master-card" type="button" data-master="magnus" aria-pressed="false"><span class="portrait avatar-magnus" aria-hidden="true"></span><span class="master-copy"><b>Magnus</b><small>Zor</small></span><span class="bot-description">Kendini zorlamak isteyenlere.</span><span class="selection-indicator" aria-hidden="true"></span></button>
 </section>
-<section class="selection-actions"><div class="start-group"><button class="start-button" id="startGameButton" type="button">Oyuna başla <span>→</span></button></div></section>
-</main>
-<main class="screen game-screen" id="gameScreen">
-<section class="game-main"><div class="opponent-bar"><button class="back-button" id="changeOpponentButton" type="button">← Rakibi değiştir</button></div>
-<div class="board-scene" id="boardScene"><div class="board-stage">
-<div class="board-heading"><div class="opponent-identity"><span class="opponent-avatar avatar-judit" id="gameOpponentFace" aria-hidden="true"></span><b id="gameOpponentName">Judit</b></div><div class="clock">09:42</div></div>
-<div class="board-frame"><div class="board" id="board" role="grid" aria-label="Satranç tahtası"></div></div>
-<div class="board-footer"><div class="board-actions"><button id="undoButton" type="button" aria-label="Hamle fikrini yeniden incele">↶</button><button id="flipButton" type="button" aria-label="Tahtayı çevir">⇅</button><div class="clock">10:00</div></div></div>
-</div></div></section>
-<aside class="game-sidebar"><section class="coach-panel" id="coachPopover" aria-label="Lens ile sohbet">
-<header><div class="coach-title"><span class="coach-avatar avatar-coach" aria-hidden="true"></span><div><b>Lens</b></div></div></header>
-<section class="coach-status"><div><span>Tahtada durum</span><b id="advantageScore">+0.4</b></div><p id="positionSummary">Beyaz biraz daha rahat.</p><div class="advantage-track"><i id="advantageFill"></i></div><div class="advantage-labels"><span>Beyaz <b id="advantageText">%57</b></span><span id="sidebarOpponentName">Judit</span></div></section>
+<section class="selection-actions"><button class="start-button" id="startGameButton" type="button" disabled>Başla <span aria-hidden="true">→</span></button><p class="selection-hint" id="selectionHint">Önce bir rakip seç.</p><p id="startError" role="alert" hidden></p></section></main>
+<main class="screen game-screen" id="gameScreen"><section class="game-main">
+<div class="opponent-bar"><button class="back-button" id="changeOpponentButton" type="button">← Rakibi değiştir</button><span id="gameActivity" role="status"></span></div>
+<div class="board-scene"><div class="board-stage"><div class="board-heading"><div class="opponent-identity" id="opponentIdentity"><span class="opponent-avatar avatar-judit" id="gameOpponentFace" aria-hidden="true"></span><b id="gameOpponentName">Judit</b></div><span class="board-note">Düşünmek için zamanın var.</span></div>
+<p class="sr-only" id="boardHelp">Ok tuşlarıyla kareler arasında gezin. Enter veya boşluk tuşuyla taş ve hedef kareyi seç.</p><p class="sr-only" id="turnAnnouncement" role="status" aria-live="polite"></p>
+<div class="board-frame"><div class="board" id="board" role="grid" aria-label="Satranç tahtası" aria-describedby="boardHelp"></div></div>
+<div class="board-footer"><div class="opponent-identity player-identity" id="playerIdentity"><span class="opponent-avatar avatar-ahmet" aria-hidden="true"></span><b>Sen</b></div><span id="boardContext" role="status"></span><button id="returnToGame" type="button" hidden>Canlı oyuna dön →</button><button id="flipButton" type="button" aria-label="Tahtayı çevir">⇅</button></div><div class="result-access" id="resultAccess" hidden><button id="reopenResult" type="button">Sonucu gör</button><button id="newGameFromBoard" type="button">Yeni oyun →</button></div><button class="jump-to-lens" id="jumpToLens" type="button">Lens’in yorumuna bak ↓</button></div></div></section>
+<aside class="game-sidebar lens-space"><div class="tutor-companion"><button id="toggleVoice" class="voice-toggle" type="button" aria-pressed="false" aria-label="Lens’in sesini aç" title="Sesli okuma"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path class="sound-waves" d="M15 8q5 4 0 8m3-11q8 7 0 14"/><path class="sound-muted" d="m16 9 5 6m0-6-5 6"/></svg></button><img class="tutor-picture" src="images/piece-lens-v1.png" alt="Gözlüklü fil karakteri Lens" width="76" height="76"/><span class="tutor-name">Lens</span></div>
+<button id="coachLauncher" class="coach-launcher" type="button" aria-expanded="false" aria-controls="coachPopover" aria-label="Lens’in yorumlarını aç"><span class="idle-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="launcher-note">Birlikte bakalım</span></button>
+<section class="coach-panel" id="coachPopover" aria-label="Lens ile sohbet" hidden><header><button id="closeCoach" type="button" aria-label="Sohbeti küçült">×</button></header>
 <div class="chat-thread" id="chatThread" role="log" aria-live="polite"></div>
-<div class="quick-prompts"><button type="button" data-question="Bu hamle neden iyi?">Neden iyi?</button><button type="button" data-question="Daha iyi hamle neydi?">Başka bir fikir</button><button type="button" data-question="Şu an kim üstün?">Kim önde?</button></div>
-<form class="chat-input" id="coachForm"><input id="coachInput" aria-label="Lens'e mesajın" placeholder="Bu hamle hakkında sor…" autocomplete="off" maxlength="400"/><button id="sendCoachPrompt" type="submit" aria-label="Mesajı gönder">↑</button></form>
-</section></aside></main></div><script src="api.js"></script><script src="app.js"></script></body></html>
+<section class="winning-chances" aria-label="Konum dengesi" hidden><div class="chances-heading"><span>Konum dengesi</span><small id="chanceCaption">Hamlen sonrası · yaklaşık</small></div><div class="chance-track" id="chanceTrack" role="img" aria-label="Henüz değerlendirme yok"><span id="whiteChanceBar"></span></div><div class="chance-labels"><span>Beyaz <b id="whiteChance">—</b></span><span>Siyah <b id="blackChance">—</b></span></div><p class="chance-disclaimer">Motor puanından türetilen yaklaşık pay; kazanma olasılığı değil.</p></section>
+<div class="coach-tools"><button id="betterQuestion" type="button" disabled>Daha iyi hangi hamle vardı?</button><button id="explainMore" type="button" disabled>Neden daha iyi?</button><button id="showOnBoard" type="button" disabled>Tahtada göster ↗</button></div>
+<form class="chat-input" id="coachForm"><label class="sr-only" for="coachInput">Lens’e mesajın</label><div><input id="coachInput" placeholder="Lens’e bir şey sor…" autocomplete="off" maxlength="400"/><button id="recordVoice" class="mic-button" type="button" aria-label="Sesle mesaj yaz" aria-pressed="false" title="Sesle mesaj yaz"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></svg></button><button id="sendCoachPrompt" type="submit" aria-label="Mesajı gönder">↑</button></div><p id="voiceStatus" class="voice-status" role="status"></p></form>
+</section></aside></main></div>
+<dialog id="gameResult" class="game-result" aria-labelledby="resultTitle" aria-describedby="resultDescription">
+<button id="closeResult" class="result-close" type="button" aria-label="Tahtaya dön">×</button>
+<img id="resultAvatar" src="images/piece-player-v1.png" alt="" width="100" height="100"/><span id="resultDrawMark" role="img" aria-label="Beraberlik" hidden>½–½</span>
+<p id="resultEyebrow" class="result-eyebrow">OYUN BİTTİ</p><h1 id="resultTitle"></h1><p id="resultDescription"></p>
+<div class="result-actions"><button id="playAgain" class="start-button" type="button">Aynı rakiple oyna <span aria-hidden="true">→</span></button><button id="chooseOpponent" type="button">Başka rakip seç</button></div>
+<button id="reviewResult" class="result-review" type="button">Son konuma bak</button>
+</dialog>
+<script src="api.js"></script><script src="app.js"></script></body></html>
