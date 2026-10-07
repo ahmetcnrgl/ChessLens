@@ -29,9 +29,9 @@ const chessLensApi = (() => {
       method: "POST",
       body: JSON.stringify({ from, to, promotion: promotion ?? null }),
     }),
-    askCoach: ({ gameId, question }) => request(`/api/games/${gameId}/coach`, {
+    askCoach: ({ gameId, question, moveId }) => request(`/api/games/${gameId}/coach`, {
       method: "POST",
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, moveId }),
     }),
   };
 })();

@@ -9,6 +9,7 @@ test("parses a centipawn info line", () => {
 
   assert.deepEqual(result, {
     depth: 12,
+    multiPv: 1,
     score: { kind: "centipawn", value: 35 },
     principalVariation: ["e7e5", "g1f3", "b8c6"],
   });
@@ -19,6 +20,7 @@ test("parses a mate info line", () => {
 
   assert.deepEqual(result, {
     depth: 18,
+    multiPv: 1,
     score: { kind: "mate", value: -3 },
     principalVariation: ["h7h8q"],
   });

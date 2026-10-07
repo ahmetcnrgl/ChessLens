@@ -439,13 +439,17 @@ async function analyzeSquare(from, to) {
     moveAnimations = [];
   }, 360);
   lastMove = response.engineMove ?? response.playedMove;
-  lesson = response.analysis.bestMove?.from ? { position: beforePosition, move: response.analysis.bestMove } : null;
+  lesson = response.analysis.bestMove?.from ? {
+    position: beforePosition,
+    move: response.analysis.bestMove,
+    description: response.coach.betterMove,
+  } : null;
   document.querySelector("#showOnBoard").disabled = !lesson;
   document.querySelector("#explainMore").disabled = false;
   renderBoard();
   document.querySelector("#betterQuestion").disabled = false;
   updateChances(response.analysis.whitePercent, gameState);
-  showCoachAnswer(response.coach.text, response.coach.betterMove, describeScore(response.analysis.score));
+  showCoachAnswer(response.coach.text, describeScore(response.analysis.score));
   setActivity(gameState.isGameOver ? "" : gameState.isCheck ? "Şah!" : "");
   showGameResult();
   } catch {
@@ -544,7 +548,7 @@ document.querySelector("#showOnBoard").addEventListener("click", () => {
   moveAnimations = [];
   position = lesson.position;
   document.querySelector("#returnToGame").hidden = false;
-  document.querySelector("#boardContext").textContent = `Hamle öncesi · Öneri: ${lesson.move.san} (${lesson.move.from} → ${lesson.move.to})`;
+  document.querySelector("#boardContext").textContent = `${lesson.focus === "current-position" ? "Mevcut konum" : "Hamle öncesi"} · ${lesson.description || "Alternatif hamle tahtada gösteriliyor"}`;
   renderBoard();
 });
 document.querySelector("#returnToGame").addEventListener("click", exitPreview);
@@ -591,11 +595,11 @@ function addUserMessage(text) {
   chatThread.appendChild(message);
 }
 
-function showCoachAnswer(text, move = null, evaluation = "") {
+function showCoachAnswer(text, evaluation = "") {
   if (gameState?.lastMoveId) coachPopover.classList.remove("is-empty");
-  latestCoachText = [text, evaluation, move && move !== "—" ? `Önerilen hamle: ${move}` : ""].filter(Boolean).join(" ");
+  latestCoachText = [text, evaluation].filter(Boolean).join(" ");
   if (!coachOpen) {
-    pendingCoachAnswer = [text, move, evaluation];
+    pendingCoachAnswer = [text, evaluation];
     document.querySelector(".launcher-note").textContent = "Yorumuma göz at";
     return;
   }
@@ -614,12 +618,6 @@ function showCoachAnswer(text, move = null, evaluation = "") {
     note.className = "evaluation-note";
     note.textContent = evaluation;
     bubble.append(note);
-  }
-  if (move && move !== "—") {
-    const suggestion = document.createElement("div");
-    suggestion.className = "better-move";
-    suggestion.textContent = "Motorun önerisi: " + move;
-    bubble.append(suggestion);
   }
   chatThread.append(bubble);
   const skip = document.createElement("button");
@@ -667,9 +665,18 @@ async function askCoach(question) {
   document.querySelector("#explainMore").disabled = true;
   setActivity("Lens yanıt hazırlıyor…");
   try {
-    const response = await api.askCoach({ gameId, question });
+    const response = await api.askCoach({ gameId, question, moveId });
     if (gameState?.gameId !== gameId || gameState.lastMoveId !== moveId) return;
-    showCoachAnswer(response.text, response.betterMove);
+    if (response.recommendation?.move) {
+      lesson = {
+        position: response.recommendation.position,
+        move: response.recommendation.move,
+        description: response.recommendation.description,
+        focus: response.focus,
+      };
+      document.querySelector("#showOnBoard").disabled = false;
+    }
+    showCoachAnswer(response.text);
     setActivity("");
   } catch {
     if (gameState?.gameId === gameId) {

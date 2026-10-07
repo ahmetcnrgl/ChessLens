@@ -89,6 +89,11 @@ class GameRecord:
     opponent: dict
     last_move_id: str | None = None
     bot_move_schedule: list[bool] = field(default_factory=list)
+    last_analysis: dict | None = None
+    last_engine_reply: dict | None = None
+    last_coach: dict | None = None
+    coach_history: list[dict[str, str]] = field(default_factory=list)
+    coach_focus: str = "last-move"
 
     @classmethod
     def create(cls, player_color: str, opponent: dict) -> "GameRecord":

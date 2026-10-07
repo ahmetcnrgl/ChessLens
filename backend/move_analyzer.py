@@ -60,5 +60,9 @@ def build_move_analysis(**kwargs) -> dict:
         "mover": kwargs["mover"],
         "evaluationBefore": kwargs["evaluationBefore"],
         "evaluationAfter": kwargs["evaluationAfter"],
+        "bestMoveLine": kwargs.get("bestMoveLine", []),
+        "opponentBestLine": kwargs.get("opponentBestLine", kwargs.get("principalVariation", [])),
+        # Keep the existing API field as an alias for the post-move engine line.
+        "principalVariation": kwargs.get("opponentBestLine", kwargs.get("principalVariation", [])),
         **outcome,
     }

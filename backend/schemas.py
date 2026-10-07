@@ -18,6 +18,13 @@ class MoveRequest(BaseModel):
     promotion: str | None = None
 
 
+class CoachQuestionRequest(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    question: str = Field(min_length=1, max_length=2000)
+    moveId: str | None = None
+
+
 class CoachResponse(BaseModel):
     text: str
     betterMove: str = "—"

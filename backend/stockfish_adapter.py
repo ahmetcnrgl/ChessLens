@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import os
 import threading
-from pathlib import Path
 
 import chess
 import chess.engine
@@ -21,9 +19,17 @@ class StockfishAdapter:
     it does not depend on python-chess engine details.
     """
 
-    def __init__(self, path: str | None = None, depth: int = 12):
+    def __init__(
+        self,
+        path: str | None = None,
+        depth: int | None = None,
+        timeout_seconds: float | None = None,
+    ):
         self.path = path or settings.stockfish_path
         self.depth = depth or settings.stockfish_depth
+        self.timeout_seconds = timeout_seconds if timeout_seconds is not None else settings.stockfish_timeout_seconds
+        if self.timeout_seconds <= 0:
+            raise ValueError("Stockfish timeout_seconds must be positive")
         self._engine: chess.engine.SimpleEngine | None = None
         self._lock = threading.Lock()
 
@@ -52,32 +58,43 @@ class StockfishAdapter:
 
         with self._lock:
             engine = self._ensure_engine()
-            engine.configure({"Skill Level": skill_level})
-            result = engine.analyse(
-                board,
-                chess.engine.Limit(depth=depth or self.depth),
-                multipv=multi_pv,
-            )
+            try:
+                engine.configure({"Skill Level": skill_level})
+                result = engine.analyse(
+                    board,
+                    chess.engine.Limit(depth=depth or self.depth, time=self.timeout_seconds),
+                    multipv=multi_pv,
+                )
+            except chess.engine.EngineError as error:
+                self.close()
+                raise StockfishUnavailable("Stockfish analysis failed or timed out") from error
 
         infos = result if isinstance(result, list) else [result]
         infos = [candidate for candidate in infos if candidate.get("pv")]
         if not infos:
-            return {"evaluation": {"kind": "centipawn", "value": 0}, "bestMove": None, "pv": [], "candidateMoves": []}
+            return {"evaluation": {"kind": "centipawn", "value": 0}, "bestMove": None, "pv": [], "candidateMoves": [], "variations": []}
         info = infos[0]
 
-        score = info["score"].pov(chess.WHITE)
-        if score.is_mate():
-            evaluation = {"kind": "mate", "value": score.mate()}
-        else:
-            evaluation = {"kind": "centipawn", "value": score.score(mate_score=100000)}
+        def format_evaluation(candidate: dict) -> dict:
+            score = candidate["score"].pov(chess.WHITE)
+            if score.is_mate():
+                return {"kind": "mate", "value": score.mate()}
+            return {"kind": "centipawn", "value": score.score(mate_score=100000)}
+
+        evaluation = format_evaluation(info)
 
         pv = [move.uci() for move in info.get("pv", [])]
-        candidates = [candidate["pv"][0].uci() for candidate in infos]
+        variations = [
+            {"evaluation": format_evaluation(candidate), "pv": [move.uci() for move in candidate["pv"]]}
+            for candidate in infos
+        ]
+        candidates = [variation["pv"][0] for variation in variations]
         return {
             "evaluation": evaluation,
             "bestMove": pv[0] if pv else None,
             "pv": pv,
             "candidateMoves": candidates,
+            "variations": variations,
         }
 
     def close(self) -> None:

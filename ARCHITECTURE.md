@@ -103,8 +103,11 @@ type MoveAnalysis = {
   evaluationBefore: Evaluation;
   evaluationAfter: Evaluation;
   lossInCentipawns?: number;
+  mateOutcome?: "found-forced-mate" | "missed-forced-mate" | "mated" | "mate-evaluation-changed";
   classification: "best" | "good" | "inaccuracy" | "mistake" | "blunder";
-  principalVariation: string[];
+  bestMoveLine: string[];       // SAN line from the position before the user's move
+  opponentBestLine: string[];   // SAN line from the position after the user's move
+  principalVariation: string[]; // compatibility alias for opponentBestLine
 };
 ```
 
@@ -116,6 +119,35 @@ type MoveAnalysis = {
 - LLM'den yapılandırılmış yanıt ister.
 - Yanıt şemasını doğrular, uzunluğunu sınırlar ve güvenli fallback üretir.
 - Motor verisiyle açık çelişki varsa yanıtı reddeder veya sade şablon kullanır.
+
+Python MVP'de takip soruları `CoachQuestionRequest` ile alınır. `GameRecord`, son
+`MoveAnalysis`, en güçlü olası cevap, gerçekten oynanan rakip hamlesi ve son koç
+açıklamasını sunucuda tutar. Soru konusu `last-move` veya `current-position`
+olarak seçilir. Sonraki hamle sorusunda mevcut tahtanın kopyası güçlü Stockfish
+ayarlarıyla yeniden analiz edilir. `OllamaCoach.answer_question`, o konunun
+verisini ve en fazla üç önceki soru/yanıt çiftini gönderir. Mevcut konum prompt'u
+eski hamlenin açıklamasını içermez. Konu değişince kısa sohbet geçmişi temizlenir;
+"neden?" gibi takip soruları önceki konuyu korur. Yeni hamle geldiğinde bağlam
+sıfırlanır; yanıt hazırlanırken hamle kimliği veya FEN değişirse yanıt reddedilir.
+
+Devam adımları python-chess ile ayrı ayrı yürütülür ve her hamlenin taş/kare
+açıklaması o adımdaki konumdan üretilir. Şah çekme, taş alma ve taşın kontrol
+ettiği merkez kareleri sunucuda hesaplanan olgulardır. Çıktı kontrolü çıplak
+hamle notasyonunu, verilen analiz dışındaki açık hamleleri ve bilinen desteksiz
+üstünlük sloganlarını yakalar; tüm satranç gerekçelerinin doğruluğunu kanıtlamaz.
+Otomatik hamle özetindeki oynanan hamle ve sınıflandırma sunucuda oluşturulur;
+LLM bu özeti rakibin cevabıyla değiştiremez. Prompt, kullanıcı/rakip renklerini
+ve yasal konumdan çıkarılan hamle kimliklerini taşır. Açık başlangıç/hedef
+kareleriyle anlatılan hamlelerde taş türü ve açıkça belirtilen oyuncu/rengi
+bu kimliklerle karşılaştırılır. Bu sınırlı kontrol tüm doğal dil ifadelerini
+veya stratejik iddiaları doğrulayan bir çözüm değildir.
+Model yanıtı geçersizse sonraki hamle sorusunda boş hata metni yerine taze yasal
+öneri ve doğrulanmış olgular döner. Tahta önizlemesi yanıtın ilgili konumunu alır.
+
+Kullanıcıya gösterilen öneri taşın adını, başlangıç ve hedef karesini içerir.
+Kare adları açıklama içinde kullanılabilir; motor metrikleri ve sıkıştırılmış
+hamle notasyonu gösterilmez. Fallback ayrıntılı koç yanıtının kullanılamadığını
+açıkça belirtir.
 
 Önerilen çıktı:
 
@@ -191,7 +223,9 @@ Uygulamada algılanan gecikmeyi azaltmak için sıralama yeniden düzenlenebilir
 - LLM anahtarı yalnızca sunucuda tutulur ve loglanmaz.
 - İstemci verisi şema ile doğrulanır; istemcinin FEN veya skor iddiasına güvenilmez.
 - Prompt'a giden alanlar allowlist ile oluşturulur.
-- Kullanıcı tarafından serbest metin alınmıyorsa prompt injection yüzeyi küçüktür; ileride alınırsa ayrı ele alınır.
+- Serbest metin koç sorusu ayrı `user` mesajında tutulur; sistem talimatları ve
+  sunucunun analiz bağlamı ayrı gönderilir. Model çıktısı doğrulanır, oyun
+  durumunu değiştiremez ve yeni motor analizi yerine geçmez.
 - Hata loglarında gizli değerler ve tam LLM istek başlıkları bulunmaz.
 - Stockfish komutları sabit UCI komutlarından oluşturulur; kullanıcı metni kabuk komutuna eklenmez.
 
